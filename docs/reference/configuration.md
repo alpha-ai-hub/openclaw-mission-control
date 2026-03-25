@@ -42,6 +42,29 @@ See `.env.example` for defaults and required values.
 - **Purpose:** Comma-separated list of trusted reverse-proxy IPs or CIDRs used to honor `Forwarded` / `X-Forwarded-For` client IP headers.
 - **Gotcha:** Leave this blank unless the direct peer is a proxy you control.
 
+## Alpha AI integration (frontend)
+
+These variables are read server-side by Next.js API proxy routes under `/api/proxy/copilot/`. They are never exposed to the browser.
+
+### `COPILOT_SERVICES_URL`
+
+- **Where set:** root `.env` → forwarded to frontend container via `compose.yml`
+- **Purpose:** Base URL of the `aai-copilot-services` Railway deployment.
+- **Format:** Must include the `https://` scheme (e.g. `https://aai-copilot-services-xxx.up.railway.app`).
+- **Gotcha:** Omitting `https://` causes all proxy requests to silently fail with a fetch error.
+
+### `COPILOT_SERVICES_API_TOKEN`
+
+- **Where set:** root `.env` → forwarded to frontend container
+- **Purpose:** Bearer token for all dashboard/events endpoints on copilot-services. Must match `DASHBOARD_API_TOKEN` in copilot-services.
+- **Used by:** `/api/proxy/copilot/events/stream`, `/api/proxy/copilot/dashboard/[...path]`
+
+### `ANALYST_REFRESH_TOKEN`
+
+- **Where set:** root `.env` → forwarded to frontend container
+- **Purpose:** Bearer token for `POST /api/analyst/refresh`. Separate from the dashboard token — matches `ANALYST_REFRESH_TOKEN` in copilot-services (same token the Railway cron uses).
+- **Used by:** `/api/proxy/copilot/analyst/refresh`
+
 ## Security response headers
 
 These environment variables control security headers added to every API response. Set any variable to blank (`""`) to disable the corresponding header.

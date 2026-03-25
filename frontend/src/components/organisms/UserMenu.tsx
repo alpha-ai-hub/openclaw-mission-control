@@ -15,6 +15,7 @@ import {
   Plus,
   Server,
   Settings,
+  Sparkles,
   Store,
   Trello,
 } from "lucide-react";
@@ -153,6 +154,7 @@ export function UserMenu({
 
           {(
             [
+              { href: "/alpha/feed", label: "Alpha AI", icon: Sparkles },
               { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
               { href: "/activity", label: "Activity", icon: Activity },
               { href: "/agents", label: "Agents", icon: Bot },

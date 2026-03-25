@@ -8,13 +8,21 @@ import {
   Bot,
   Boxes,
   CheckCircle2,
+  ChevronDown,
   Folder,
   Building2,
+  GitBranch,
   LayoutGrid,
+  LineChart,
   Network,
+  Radio,
+  Server,
   Settings,
+  Shield,
+  Sparkles,
   Store,
   Tags,
+  TrendingUp,
 } from "lucide-react";
 
 import { useAuth } from "@/auth/clerk";
@@ -64,6 +72,105 @@ export function DashboardSidebar() {
           Navigation
         </p>
         <nav className="mt-3 space-y-4 text-sm">
+          {/* Alpha AI — top-level entry, expands when active */}
+          <div>
+            <Link
+              href="/alpha/feed"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition",
+                pathname.startsWith("/alpha")
+                  ? "bg-blue-600 text-white"
+                  : "text-slate-700 hover:bg-slate-100",
+              )}
+            >
+              <Sparkles className="h-4 w-4 flex-shrink-0" />
+              <span className="flex-1">Alpha AI</span>
+              <ChevronDown
+                className={cn(
+                  "h-3.5 w-3.5 transition-transform",
+                  pathname.startsWith("/alpha") ? "rotate-180 opacity-80" : "opacity-40",
+                )}
+              />
+            </Link>
+
+            {pathname.startsWith("/alpha") && (
+              <div className="mt-1 ml-3 space-y-0.5 border-l border-slate-200 pl-3">
+                <Link
+                  href="/alpha/feed"
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition",
+                    pathname.startsWith("/alpha/feed")
+                      ? "bg-blue-50 text-blue-800 font-medium"
+                      : "hover:bg-slate-100",
+                  )}
+                >
+                  <Radio className="h-3.5 w-3.5" />
+                  Feed
+                </Link>
+                <Link
+                  href="/alpha/analysts/macro"
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition",
+                    pathname.startsWith("/alpha/analysts/macro")
+                      ? "bg-blue-50 text-blue-800 font-medium"
+                      : "hover:bg-slate-100",
+                  )}
+                >
+                  <TrendingUp className="h-3.5 w-3.5" />
+                  Macro
+                </Link>
+                <Link
+                  href="/alpha/analysts/technical"
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition",
+                    pathname.startsWith("/alpha/analysts/technical")
+                      ? "bg-blue-50 text-blue-800 font-medium"
+                      : "hover:bg-slate-100",
+                  )}
+                >
+                  <LineChart className="h-3.5 w-3.5" />
+                  Technical
+                </Link>
+                <Link
+                  href="/alpha/agents"
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition",
+                    pathname.startsWith("/alpha/agents")
+                      ? "bg-blue-50 text-blue-800 font-medium"
+                      : "hover:bg-slate-100",
+                  )}
+                >
+                  <GitBranch className="h-3.5 w-3.5" />
+                  Agents
+                </Link>
+                <Link
+                  href="/alpha/admin"
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition",
+                    pathname.startsWith("/alpha/admin")
+                      ? "bg-blue-50 text-blue-800 font-medium"
+                      : "hover:bg-slate-100",
+                  )}
+                >
+                  <Shield className="h-3.5 w-3.5" />
+                  Admin
+                </Link>
+                <Link
+                  href="/alpha/railway"
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition",
+                    pathname.startsWith("/alpha/railway")
+                      ? "bg-blue-50 text-blue-800 font-medium"
+                      : "hover:bg-slate-100",
+                  )}
+                >
+                  <Server className="h-3.5 w-3.5" />
+                  Services
+                </Link>
+              </div>
+            )}
+          </div>
+
           <div>
             <p className="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
               Overview
