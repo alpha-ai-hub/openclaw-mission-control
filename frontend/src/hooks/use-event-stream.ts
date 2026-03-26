@@ -43,12 +43,19 @@ export function useEventStream(maxItems = 200) {
           const type = parsed.type ?? "unknown";
           if (type === "connected") return;
 
+          // The SSE frame payload is { type, timestamp, data: { ...fields } }.
+          // Unwrap the inner data so consumers get the event-specific fields directly.
+          const eventData =
+            parsed.data && typeof parsed.data === "object"
+              ? (parsed.data as Record<string, unknown>)
+              : (parsed as Record<string, unknown>);
+
           const event: FeedEvent = {
             id: `evt-${++eventCounter}-${Date.now()}`,
             type,
             timestamp: parsed.timestamp ?? new Date().toISOString(),
             priority: PRIORITY_MAP[type] ?? "low",
-            data: parsed,
+            data: eventData,
           };
 
           setEvents((prev) => [event, ...prev].slice(0, maxItems));

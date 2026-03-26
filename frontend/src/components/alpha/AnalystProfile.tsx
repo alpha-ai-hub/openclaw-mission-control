@@ -8,11 +8,31 @@ import type { AnalystProfile as AnalystProfileType } from "@/hooks/use-copilot-a
 
 type Props = {
   profile: AnalystProfileType;
+  lastUpdated?: string;
 };
 
-export function AnalystProfile({ profile }: Props) {
+export function AnalystProfile({ profile, lastUpdated }: Props) {
   return (
     <div className="space-y-6">
+      {/* Meta */}
+      {(profile.domain || lastUpdated || profile.last_updated) && (
+        <div className="flex items-center gap-3 text-xs text-slate-400">
+          {profile.domain && (
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium capitalize">
+              {profile.domain}
+            </span>
+          )}
+          {(lastUpdated ?? profile.last_updated) && (
+            <span>
+              Updated{" "}
+              {formatDistanceToNow(new Date(lastUpdated ?? profile.last_updated!), {
+                addSuffix: true,
+              })}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Current Outlook */}
       <Card>
         <CardHeader>

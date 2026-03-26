@@ -1,10 +1,106 @@
 "use client";
 
+import { formatDistanceToNow } from "date-fns";
+import { Clock, RefreshCw } from "lucide-react";
 import { DashboardPageLayout } from "@/components/templates/DashboardPageLayout";
 import { HealthCard } from "@/components/alpha/HealthCard";
 import { PipelineStats } from "@/components/alpha/PipelineStats";
 import { RunHistoryTable } from "@/components/alpha/RunHistoryTable";
-import { useDashboardHealth, usePipelineStats, useRunHistory } from "@/hooks/use-copilot-api";
+import {
+  useDashboardHealth,
+  usePipelineStats,
+  useRunHistory,
+  useAnalystProfile,
+  useAnalystRefresh,
+} from "@/hooks/use-copilot-api";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+function AnalystChangeLog({ name }: { name: string }) {
+  const { data, isLoading, error } = useAnalystProfile(name);
+  const refresh = useAnalystRefresh();
+
+  const profile = data?.profile;
+  const changeLog = profile?.change_log ?? [];
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-slate-400" />
+            <h3 className="text-sm font-semibold text-slate-700">
+              {name} — Analyst Change Log
+            </h3>
+            {profile?.last_updated && (
+              <span className="text-xs text-slate-400">
+                last updated{" "}
+                {formatDistanceToNow(new Date(profile.last_updated), { addSuffix: true })}
+              </span>
+            )}
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={refresh.isPending}
+            onClick={() => refresh.mutate(name)}
+          >
+            <RefreshCw className={`h-3 w-3 mr-1.5 ${refresh.isPending ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isLoading && <p className="text-sm text-slate-400">Loading…</p>}
+        {error && (
+          <p className="text-sm text-red-600">Failed to load: {error.message}</p>
+        )}
+        {!isLoading && !error && changeLog.length === 0 && (
+          <p className="text-sm text-slate-400 italic">No change log entries yet.</p>
+        )}
+        {changeLog.length > 0 && (
+          <ol className="space-y-3">
+            {changeLog.map((entry, i) => (
+              <li
+                key={`${entry.timestamp}-${i}`}
+                className="flex items-start gap-3 text-sm"
+              >
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-slate-300 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="outline" className="text-xs font-mono">
+                      {entry.field}
+                    </Badge>
+                    <span className="text-xs text-slate-400">
+                      {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
+                    </span>
+                  </div>
+                  {(entry.old_value || entry.new_value) && (
+                    <div className="mt-1 grid grid-cols-2 gap-2 text-xs">
+                      {entry.old_value && (
+                        <div className="rounded bg-red-50 px-2 py-1 text-red-700">
+                          <span className="font-medium">before: </span>
+                          {entry.old_value}
+                        </div>
+                      )}
+                      {entry.new_value && (
+                        <div className="rounded bg-green-50 px-2 py-1 text-green-700">
+                          <span className="font-medium">after: </span>
+                          {entry.new_value}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function AdminPage() {
   const health = useDashboardHealth();
@@ -41,6 +137,17 @@ export default function AdminPage() {
           ) : null}
         </section>
 
+        {/* Analyst Change Logs */}
+        <section>
+          <h2 className="text-sm font-semibold text-slate-600 mb-3">
+            Analyst Ingestion Change Logs
+          </h2>
+          <div className="space-y-4">
+            <AnalystChangeLog name="Luke" />
+            <AnalystChangeLog name="Gabriel" />
+          </div>
+        </section>
+
         {/* Pipeline Stats */}
         <section>
           <h2 className="text-sm font-semibold text-slate-600 mb-3">Pipeline Statistics</h2>
@@ -55,7 +162,7 @@ export default function AdminPage() {
           ) : null}
         </section>
 
-        {/* Run History */}
+        {/* Ingestion Runs */}
         <section>
           <h2 className="text-sm font-semibold text-slate-600 mb-3">Ingestion Runs</h2>
           <RunHistoryTable runs={runs.data ?? []} isLoading={runs.isLoading} />

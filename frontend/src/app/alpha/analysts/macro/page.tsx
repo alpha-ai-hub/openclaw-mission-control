@@ -21,7 +21,7 @@ export default function MacroPage() {
           Failed to load profile: {error.message}
         </div>
       )}
-      {data && <AnalystProfile profile={data} />}
+      {data && <AnalystProfile profile={data.profile} />}
     </DashboardPageLayout>
   );
 }

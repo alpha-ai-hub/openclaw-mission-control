@@ -24,8 +24,17 @@ function summarize(event: FeedEvent): string {
   switch (event.type) {
     case "profile_updated":
       return `${d.analyst_name ?? "Analyst"} profile updated — ${(d.fields_changed as string[])?.join(", ") ?? "fields changed"}`;
-    case "ingestion_run_completed":
-      return `${d.run_type ?? "Run"} ${d.status ?? "completed"}${d.result ? ` — ${JSON.stringify(d.result)}` : ""}`;
+    case "ingestion_run_completed": {
+      const status = String(d.status ?? "completed");
+      const runType = String(d.run_type ?? "run").replace(/_/g, " ");
+      const result = d.result as Record<string, unknown> | undefined;
+      const detail = result
+        ? Object.entries(result)
+            .map(([k, v]) => `${k.replace(/_/g, " ")}: ${v}`)
+            .join(" · ")
+        : "";
+      return `${runType} ${status}${detail ? ` — ${detail}` : ""}`;
+    }
     case "transcript_processed":
       return `${d.title ?? "Transcript"} (${d.source_type ?? "source"}) — ${d.chunks ?? "?"} chunks`;
     case "slack_processed":
